@@ -44,7 +44,7 @@ def chat_send():
     else:
         message = request.args.get('message')
         if message == '' or len(message) > 50:
-            return 400
+            return '', 400
         if last_message == message and last_message_author == session["user"]:
             return 'spam is not authorized', 400
         last_message = message; last_message_author = session["user"]
