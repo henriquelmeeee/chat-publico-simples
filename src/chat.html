@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+</head>
+<style>
+    body {
+        background-color: rgba(0, 0, 0, 0.76);
+    }
+    .sendMessage {
+        float: inline-start;
+        position: absolute;
+        bottom: 3px;
+        display: block;
+    }
+    li {
+        list-style-type: none; 
+        color: white;
+    }
+</style>
+<body>
+    <ul id="messages">
+    </ul>
+    <div class="sendMessage">
+        <input type="text" placeholder="Enviar mensagem">
+        <button type="submit" onclick="enviarMensagem()">Enviar mensagem</button>
+    </div>
+</body>
+<script>
+
+    var last_message = ''
+
+    function enviarMensagem() {
+        message = document.querySelector("input").value;
+        if (message != '') {
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "/api/chat/send/?message=" + message);
+            xhr.setRequestHeader("Accept", "application/json");
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                //document.getElementById('messages').innerHTML += '<li>' + '{{user}}' + ': ' + message + '</li>'
+            }};
+
+            xhr.send(null)
+        }
+    }
+
+    async function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function getMessages() {
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", "/api/chat/get/");
+        xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            var message = xhr.responseText
+            if (message != last_message) {
+                document.getElementById('messages').innerHTML += '<li>' + message + '</li>'
+                last_message = message
+            }
+        }};
+        xhr.send(null)
+    }
+    window.onload = async function () {
+        while(true) {
+            await sleep(600)
+            getMessages()
+        }
+    }
+</script>
+</html>
